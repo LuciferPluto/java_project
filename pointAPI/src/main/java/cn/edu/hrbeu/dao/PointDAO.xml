@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.hrbeu.dao.PointDAO">
+    <select id="queryAllPoint" resultType="java.util.Map">
+        SELECT t.point_id pointId FROM point_xy t;
+    </select>
+
+    <insert id="insertPersonNum" >
+    INSERT INTO point_person_count(count_id,point_id,person_number,count_time)
+    VALUES
+    (
+         #{countId},
+         #{pointId},
+         #{personNum},
+         '${countTime}'
+    )
+
+    </insert>
+    <select id="getUserByName" resultType="java.util.Map">
+        select * from sys_user t where t.username = #{username} and password = #{password}
+    </select>
+    <select id="getDisNumberByCity"  resultType="java.util.Map">
+        SELECT
+            '${count_date}' count_date, dis_name , sum(person_number) person_number
+        FROM
+            point_person_count t,
+            dis_info t1,
+            point_xy t2
+        WHERE
+            t.point_id = t2.point_id
+          AND t2.point_dis_id = t1.dis_id
+          and t1.city_code4 =#{city_code4}
+          and t.count_time like '${count_date}%'
+        group by 	'${count_date}' , dis_name
+    </select>
+    <select id="queryDisDayNum"  resultType="java.util.Map">
+
+        SELECT
+        t1.dis_code,
+        t1.dis_name,
+        t1.city_code4,
+        t1.city_name,
+        SUBSTR(t.count_time, 1, 8 ) count_date,
+        SUM(person_number) person_number
+        FROM
+        point_person_count t,
+        dis_info t1,
+        point_xy t2
+        WHERE t.point_id = t2.point_id
+            AND t2.point_dis_id = t1.dis_id
+            AND t1.dis_code = #{dis_code}
+            AND t.count_time <![CDATA[>=  ]]> '${end_date}235959' AND t.count_time <![CDATA[<=  ]]> '${begin_date}000000'
+
+        GROUP BY
+        t1.dis_code,
+        t1.dis_name,
+        t1.city_name,
+        t1.city_code4,
+        SUBSTR(t.count_time, 1, 8 )
+
+
+    </select>
+</mapper>

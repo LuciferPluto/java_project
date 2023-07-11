@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bootdo.point.dao.XyDao">
+
+	<select id="get" resultType="com.bootdo.point.domain.XyDO">
+		select `point_id`,`wgs84_lon`,`wgs84_lat`,`bd_lon`,`bd_lat`,`bd_dis_name`,`bd_city_code`,`bd_city_name`,`bd_dis_code`,`point_dis_id` from point_xy where point_id = #{value}
+	</select>
+
+	<select id="list" resultType="com.bootdo.point.domain.XyDO">
+		select `point_id`,`wgs84_lon`,`wgs84_lat`,`bd_lon`,`bd_lat`,`bd_dis_name`,`bd_city_code`,`bd_city_name`,`bd_dis_code`,`point_dis_id` from point_xy
+        <where>  
+		  		  <if test="pointId != null and pointId != ''"> and point_id = #{pointId} </if>
+		  		  <if test="wgs84Lon != null and wgs84Lon != ''"> and wgs84_lon = #{wgs84Lon} </if>
+		  		  <if test="wgs84Lat != null and wgs84Lat != ''"> and wgs84_lat = #{wgs84Lat} </if>
+		  		  <if test="bdLon != null and bdLon != ''"> and bd_lon = #{bdLon} </if>
+		  		  <if test="bdLat != null and bdLat != ''"> and bd_lat = #{bdLat} </if>
+		  		  <if test="bdDisName != null and bdDisName != ''"> and bd_dis_name = #{bdDisName} </if>
+		  		  <if test="bdCityCode != null and bdCityCode != ''"> and bd_city_code = #{bdCityCode} </if>
+		  		  <if test="bdCityName != null and bdCityName != ''"> and bd_city_name = #{bdCityName} </if>
+		  		  <if test="bdDisCode != null and bdDisCode != ''"> and bd_dis_code = #{bdDisCode} </if>
+		  		  <if test="pointDisId != null and pointDisId != ''"> and point_dis_id = #{pointDisId} </if>
+		  		</where>
+        <choose>
+            <when test="sort != null and sort.trim() != ''">
+                order by ${sort} ${order}
+            </when>
+			<otherwise>
+                order by point_id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="count" resultType="int">
+		select count(*) from point_xy
+		 <where>  
+		  		  <if test="pointId != null and pointId != ''"> and point_id = #{pointId} </if>
+		  		  <if test="wgs84Lon != null and wgs84Lon != ''"> and wgs84_lon = #{wgs84Lon} </if>
+		  		  <if test="wgs84Lat != null and wgs84Lat != ''"> and wgs84_lat = #{wgs84Lat} </if>
+		  		  <if test="bdLon != null and bdLon != ''"> and bd_lon = #{bdLon} </if>
+		  		  <if test="bdLat != null and bdLat != ''"> and bd_lat = #{bdLat} </if>
+		  		  <if test="bdDisName != null and bdDisName != ''"> and bd_dis_name = #{bdDisName} </if>
+		  		  <if test="bdCityCode != null and bdCityCode != ''"> and bd_city_code = #{bdCityCode} </if>
+		  		  <if test="bdCityName != null and bdCityName != ''"> and bd_city_name = #{bdCityName} </if>
+		  		  <if test="bdDisCode != null and bdDisCode != ''"> and bd_dis_code = #{bdDisCode} </if>
+		  		  <if test="pointDisId != null and pointDisId != ''"> and point_dis_id = #{pointDisId} </if>
+		  		</where>
+	</select>
+	 
+	<insert id="save" parameterType="com.bootdo.point.domain.XyDO">
+		insert into point_xy
+		(
+			`point_id`, 
+			`wgs84_lon`, 
+			`wgs84_lat`, 
+			`bd_lon`, 
+			`bd_lat`, 
+			`bd_dis_name`, 
+			`bd_city_code`, 
+			`bd_city_name`, 
+			`bd_dis_code`, 
+			`point_dis_id`
+		)
+		values
+		(
+			uuid(),
+			#{wgs84Lon}, 
+			#{wgs84Lat}, 
+			#{bdLon}, 
+			#{bdLat}, 
+			#{bdDisName}, 
+			#{bdCityCode}, 
+			#{bdCityName}, 
+			#{bdDisCode}, 
+			#{pointDisId}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.bootdo.point.domain.XyDO">
+		update point_xy 
+		<set>
+			<if test="wgs84Lon != null">`wgs84_lon` = #{wgs84Lon}, </if>
+			<if test="wgs84Lat != null">`wgs84_lat` = #{wgs84Lat}, </if>
+			<if test="bdLon != null">`bd_lon` = #{bdLon}, </if>
+			<if test="bdLat != null">`bd_lat` = #{bdLat}, </if>
+			<if test="bdDisName != null">`bd_dis_name` = #{bdDisName}, </if>
+			<if test="bdCityCode != null">`bd_city_code` = #{bdCityCode}, </if>
+			<if test="bdCityName != null">`bd_city_name` = #{bdCityName}, </if>
+			<if test="bdDisCode != null">`bd_dis_code` = #{bdDisCode}, </if>
+			<if test="pointDisId != null">`point_dis_id` = #{pointDisId}</if>
+		</set>
+		where point_id = #{pointId}
+	</update>
+	
+	<delete id="remove">
+		delete from point_xy where point_id = #{value}
+	</delete>
+	
+	<delete id="batchRemove">
+		delete from point_xy where point_id in 
+		<foreach item="pointId" collection="array" open="(" separator="," close=")">
+			#{pointId}
+		</foreach>
+	</delete>
+
+</mapper>

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+<script type="text/javascript" src="https://api.map.baidu.com/api?v=1.0&&type=webgl&ak=q0tOZHuv6iRyqnyFXL1MH9Y3liZ0LSqE"></script>
+<div  id = "left_div" class="col-md-3" style="height: 70% ; border:1px solid #cccccc" > 1</div>
+<div id = "md_div" class="col-md-6" style="height: 70% ; border:1px solid #cccccc"> 2</div>
+<div id = "right_div" class="col-md-3" style="height: 70% ; border:1px solid #cccccc">
+    <div id="right_top_div" style="width: 100% ; height: 50% "> 3</div>
+    <div id="right_bottom_div" style="width: 100% ; height: 50% "> 4</div>
+</div>
+<div id = "bottom_div" class="col-md-12" style="width:100% ;height: 30% ; border:1px solid #cccccc"> 4</div>
+<div th:include="include :: footer"></div>
+<script src = "/js/plugins/echarts/echarts-all.js"></script>
+
+<script>
+    $(function (){
+        show_left_chart();
+        show_md_map();
+        show_bottom_chart();
+
+        show_right_top();
+        show_right_bottom();
+    })
+
+    function show_right_bottom(){
+
+        var strJson = JSON.stringify({"city_code4": "2301"});
+        $.ajax({
+            url: "/point/queryDisPercent",
+            type: "post",
+            contentType: "application/json",
+            data: strJson,
+            success: function (r) {
+                var return_data = eval('(' + r + ')');
+                console.log(r)
+                var myChart = echarts.init(document.getElementById("right_bottom_div"));
+                var option = {
+                    title: {
+                        text: '区县人数占比'
+                    }
+                    , series: [{
+                        radius: ['30%', '80%'],
+                        type: 'pie',
+                        data: return_data
+                    }]
+                }
+                myChart.setOption(option);
+            }
+        });
+
+    }
+    function show_right_top(){
+
+        $.ajax({
+            url: "/point/queryCityPercent",
+            type: "POST",
+            contentType: "application/json",
+            data: {},
+            success: function (r) {
+                var return_data = eval('(' + r + ')');
+
+                var data_arr = new Array();
+                for (let i = 0; i < return_data.length; i++) {
+                    data_arr[i]= {"name":return_data[i].city_name , "value":return_data[i].num}
+                }
+
+                var myChart = echarts.init(document.getElementById("right_top_div"));
+                var option = {
+                    title: {
+                        text: '人数占比饼状图'
+                    }
+                    , series: [{
+                        type: 'pie',
+                        data: data_arr
+                    }]
+                }
+                myChart.setOption(option);
+            }
+        });
+
+    }
+    function show_bottom_chart(){
+
+
+        $.ajax({
+            url: "/point/queryNumAPIDate",
+            type: "POST",
+            contentType: "application/json",
+            data: {},
+            success: function (r) {
+                console.log(r)
+                var return_data = eval('(' + r + ')');
+                var x_data = new Array();
+                var num_data = new Array();
+                console.log(return_data)
+                for (var i = 0; i < return_data.length; i++) {
+                    x_data[i] = return_data[i].update_date;
+                    num_data[i] = return_data[i].num
+
+                }
+
+                var myChart = echarts.init(document.getElementById("bottom_div"));
+                var option = {
+                    title: {
+                        text: '2023年7月5日区县访客情况'
+                    },
+                    xAxis: {
+                        data: x_data
+                    },
+                    yAxis: {}
+                    , series: [{
+                        type: 'line',
+                        data: num_data
+                    }
+                    ]
+
+                }
+                myChart.setOption(option);
+            }
+        });
+
+
+
+    }
+    function show_md_map(){
+
+        var map = new BMapGL.Map("md_div");
+        var point = new BMapGL.Point(126.67212144283639, 45.761133815965717);
+        map.centerAndZoom(point, 12);
+        map.enableScrollWheelZoom(true);
+
+        $.ajax({
+            url: "/point/queryAllPoint",
+            type: "POST",
+            contentType: "application/json",
+            data: {},
+            success: function (r) {
+                console.log(r)
+                var return_data = eval('(' + r + ')');
+                console.log(return_data)
+                for (var i = 0; i < return_data.length; i++) {
+                    var marker = new BMapGL.Marker(new BMapGL.Point(return_data[i].bd_lon, return_data[i].bd_lat)); // 创建点
+                    map.addOverlay(marker); //增加点
+
+                }
+            }
+        });
+
+        /*var polyline = new BMapGL.Polyline([
+            new BMapGL.Point(126.67212144283639,45.761133815965717),
+            new BMapGL.Point(126.62930298514562, 45.71279252404299),
+            new BMapGL.Point(126.66816668341954, 45.72453876548806)
+        ], {strokeColor:"blue", strokeWeight:2, strokeOpacity:0.5});   //创建折线
+
+        map.addOverlay(polyline);*/          //增加折线
+
+
+    }
+    function show_left_chart() {
+        var param = {
+            "count_date": "20230706", "city_code4": "2301"
+        };
+        var strJson = JSON.stringify(param);
+        $.ajax({
+            url: "/point/queryNumByDate",
+            type: "POST",
+            contentType: "application/json",
+            data: strJson,
+            success: function (r) {
+                console.log(r)
+                var return_data = eval('(' + r + ')');
+                var x_data = new Array();
+                var num_data = new Array();
+                console.log(return_data)
+                for (var i = 0; i < return_data.length; i++) {
+                    x_data[i] = return_data[i].dis_name;
+                    num_data[i] = return_data[i].person_num
+
+                }
+
+                var myChart = echarts.init(document.getElementById("left_div"));
+                var option = {
+                    title: {
+                        text: '2023年7月5日区县访客情况'
+                    },
+                    xAxis: {
+                        data: x_data
+                    },
+                    yAxis: {}
+                    , series: [{
+                        type: 'bar',
+                        data: num_data
+                    }
+                    ]
+
+                }
+                myChart.setOption(option);
+            }
+        });
+    }
+</script>
+</body>
+</html>

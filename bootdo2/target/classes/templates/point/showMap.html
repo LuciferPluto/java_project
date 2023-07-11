@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+
+<body class="gray-bg">
+<script type="text/javascript"
+        src="https://api.map.baidu.com/api?v=1.0&&type=webgl&ak=q0tOZHuv6iRyqnyFXL1MH9Y3liZ0LSqE"></script>
+<h1 align=center>哈尔滨市区地图展示一览</h1>
+<div id="md_div" style="height:100%; border:1px solid #cccccc"> </div>
+<div th:include="include :: footer"></div>
+<script src="/js/plugins/echarts/echarts-all.js"></script>
+<script>
+    $(function () {
+
+        show_center_map();
+     
+    })
+
+    function show_center_map() {
+        var map = new BMapGL.Map("md_div");
+        var point = new BMapGL.Point(126.73172549805368, 45.769011272739259);
+        map.centerAndZoom(point, 12);
+        map.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
+
+        $.ajax({
+            url: "/point/queryAllPoint",
+            type: "post",
+            contentType: "application/json", //json请求
+            data: {},
+            success: function (r) {
+                console.log(r)
+                var return_data = eval('(' + r + ')');
+                console.log(return_data)
+                // todo：遍历返回参数，在地图上展示坐标点
+
+            }
+        });
+    }
+
+
+</script>
+</body>
+</html>

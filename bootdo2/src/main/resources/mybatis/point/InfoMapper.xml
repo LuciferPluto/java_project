@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bootdo.point.dao.InfoDao">
+
+	<select id="get" resultType="com.bootdo.point.domain.InfoDO">
+		select `dis_id`,`dis_code`,`dis_name`,`city_code3`,`city_code4`,`city_name` from dis_info where dis_id = #{value}
+	</select>
+
+	<select id="list" resultType="com.bootdo.point.domain.InfoDO">
+		select `dis_id`,`dis_code`,`dis_name`,`city_code3`,`city_code4`,`city_name` from dis_info
+        <where>  
+		  		  <if test="disId != null and disId != ''"> and dis_id = #{disId} </if>
+		  		  <if test="disCode != null and disCode != ''"> and dis_code = #{disCode} </if>
+		  		  <if test="disName != null and disName != ''"> and dis_name = #{disName} </if>
+		  		  <if test="cityCode3 != null and cityCode3 != ''"> and city_code3 = #{cityCode3} </if>
+		  		  <if test="cityCode4 != null and cityCode4 != ''"> and city_code4 = #{cityCode4} </if>
+		  		  <if test="cityName != null and cityName != ''"> and city_name = #{cityName} </if>
+		  		</where>
+        <choose>
+            <when test="sort != null and sort.trim() != ''">
+                order by ${sort} ${order}
+            </when>
+			<otherwise>
+                order by dis_id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="count" resultType="int">
+		select count(*) from dis_info
+		 <where>  
+		  		  <if test="disId != null and disId != ''"> and dis_id = #{disId} </if>
+		  		  <if test="disCode != null and disCode != ''"> and dis_code = #{disCode} </if>
+		  		  <if test="disName != null and disName != ''"> and dis_name = #{disName} </if>
+		  		  <if test="cityCode3 != null and cityCode3 != ''"> and city_code3 = #{cityCode3} </if>
+		  		  <if test="cityCode4 != null and cityCode4 != ''"> and city_code4 = #{cityCode4} </if>
+		  		  <if test="cityName != null and cityName != ''"> and city_name = #{cityName} </if>
+		  		</where>
+	</select>
+	 
+	<insert id="save" parameterType="com.bootdo.point.domain.InfoDO">
+		insert into dis_info
+		(
+			`dis_id`, 
+			`dis_code`, 
+			`dis_name`, 
+			`city_code3`, 
+			`city_code4`, 
+			`city_name`
+		)
+		values
+		(
+			uuid(),
+			#{disCode}, 
+			#{disName}, 
+			#{cityCode3}, 
+			#{cityCode4}, 
+			#{cityName}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.bootdo.point.domain.InfoDO">
+		update dis_info 
+		<set>
+			<if test="disCode != null">`dis_code` = #{disCode}, </if>
+			<if test="disName != null">`dis_name` = #{disName}, </if>
+			<if test="cityCode3 != null">`city_code3` = #{cityCode3}, </if>
+			<if test="cityCode4 != null">`city_code4` = #{cityCode4}, </if>
+			<if test="cityName != null">`city_name` = #{cityName}</if>
+		</set>
+		where dis_id = #{disId}
+	</update>
+	
+	<delete id="remove">
+		delete from dis_info where dis_id = #{value}
+	</delete>
+	
+	<delete id="batchRemove">
+		delete from dis_info where dis_id in 
+		<foreach item="disId" collection="array" open="(" separator="," close=")">
+			#{disId}
+		</foreach>
+	</delete>
+
+</mapper>

@@ -1,0 +1,45 @@
+<html>
+
+<head>
+    <meta charset="utf8">
+</head>
+
+<body>
+    <script src="../../../../../../../../../../Users/13504/Desktop/echarts.js"></script>
+
+    <div id="main" style="width:1000px;height:400px"></div>
+    <script type="text/javascript">
+        var myChart = echarts.init(document.getElementById("main"));
+        var option = {
+            title: {
+                text: '我的第一个echarts可视化视图'
+            },
+            xAxis: {
+                data: ['2023年\n6月1日', '2023年\n6月2日', '2023年\n6月3日', '2023年\n6月4日', '2023年\n6月5日']
+            },
+            yAxis: {
+
+            }
+            , series: [{
+                type: 'bar',
+                data: [100, 200, 550, 619, 131]
+ 
+            }
+            /**/
+            , {
+                type: 'bar',
+                data: [102, 288, 529, 770, 120]
+  
+            }, {
+                type: 'bar',
+                data: [119, 299, 799, 1111, 121]
+            }
+            ]
+
+        }
+        myChart.setOption(option);
+
+    </script>
+</body>
+
+</html>
